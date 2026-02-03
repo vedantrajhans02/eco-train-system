@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "eco-train-system"
+version = "0.1.0"
+description = "Carbon-Aware AI Scheduler for optimizing ML workloads"
+authors = ["Vedant Rajhans"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+streamlit = "^1.31.0"
+pandas = "^2.2.0"
+plotly = "^5.18.0"
+boto3 = "^1.34.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

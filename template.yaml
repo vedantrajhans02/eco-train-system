@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Eco-Train carbon-aware scheduler backend
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.11
+    MemorySize: 256
+
+Resources:
+  CarbonJobFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_handler.lambda_handler
+      CodeUri: .
+      Description: Triggers a carbon-aware job and logs to DynamoDB
+      Environment:
+        Variables:
+          CARBON_JOBS_TABLE: !Ref CarbonJobsTable
+          ELECTRICITY_MAP_API_KEY: ''  # Set a real API key in your deployment environment
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CarbonJobsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /trigger
+            Method: post
+
+  CarbonJobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: JobId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: JobId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL for triggering carbon jobs
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/trigger"
